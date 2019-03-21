@@ -1,7 +1,7 @@
 # coding:utf-8
 import math
 import random
-
+import numpy as np
 
 class BasciSVDModel:
     '''
@@ -17,18 +17,6 @@ class BasciSVDModel:
         items：包含所有字段的列表
         mse_result:每十次迭代保存一次mse
     '''
-    P = {}
-    Q = {}
-    mu=0
-    bu = 0
-    bi = 0
-    F = 5
-    user_items = {}
-    users = []
-    items = []
-    mse_result=[]
-    
-    
     '''
     根据user-item信息以及隐隐含因子数量初始化PQ矩阵
     输入：
@@ -37,6 +25,13 @@ class BasciSVDModel:
       F:兴趣因子数
     '''
     def __init__(self, users, items,F):
+        self.P = {}
+        self.Q = {}
+        self.mu=0
+        self.bu = 0
+        self.bi = 0
+        self.user_items = {}
+        self.mse_result=[]        
         self.F = F
         self.users = users
         self.items = items
@@ -66,7 +61,7 @@ class BasciSVDModel:
             item:物品标识
     '''
     def elem_mse(self,user,item):
-        return math.pow(self.user_items[user][item] - sum(self.P[user][f]*self.Q[item][f] for f in range(self.F)),2)
+        return math.pow(self.user_items[user][item] - self.predict(user,item),2)
     '''
         计算整个矩阵的mse
     '''
@@ -74,7 +69,7 @@ class BasciSVDModel:
         scores = []
         for user in self.users:
             for item in self.items:
-                scores.append(math.pow(self.user_items[user][item] - sum(self.P[user][f]*self.Q[item][f] for f in range(self.F)),2))
+                scores.append(math.pow(self.user_items[user][item] - self.predict(user,item),2))
         return sum(scores)/len(scores)
         
     '''
@@ -117,11 +112,8 @@ class BasciSVDModel:
 
         self.bu = {user:np.mean(ruis) for user,ruis in user_ruis.items()}
         self.bi = {item:np.mean(ruis) for item,ruis in item_ruis.items()}
-        print(self.bu)
-        print(self.bi)
         self.mu = np.mean([ruis for item,ruis in self.bu.items()])
         
-        print(self.mu)
         # 更新参数
         for step in range(steps):
             for user,items in user_items.items():
@@ -134,6 +126,7 @@ class BasciSVDModel:
                         self.Q[item][f] +=alpha *(eui * self.P[user][f] - _lambda * self.Q[item][f])
             if(step % 10 ==0):
                 self.mse_result.append(self.mse())
+            #alpha = alpha*0.9
 '''
 user_items = {1: {'a': 1, 'b': 1, 'c': 1, 'd': 2, 'e': 2, 'f': 2, 'g': 3},
               2: {'a': 4, 'b': 4, 'c': 5, 'd': 5, 'e': 4, 'f': 3, 'g': 1},

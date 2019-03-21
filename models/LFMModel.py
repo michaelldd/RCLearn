@@ -3,12 +3,7 @@ import math
 import random
 
 class LFMModel:
-    P = {}
-    Q = {}
-    F = 5
-    user_items = {}
-    users = {}
-    items = {}
+
     '''
     根据user-item信息以及隐隐含因子数量初始化PQ矩阵
     输入：
@@ -17,6 +12,10 @@ class LFMModel:
       F:兴趣因子数
     '''
     def __init__(self, users, items,F):
+        self.P = {}
+        self.Q = {}
+        self.user_items = {}
+        self.mse_result = []
         self.F = F
         self.users = users
         self.items = items
@@ -92,6 +91,8 @@ class LFMModel:
                     for f in range(self.F):
                         self.P[user][f] +=alpha * (eui * self.Q[item][f] - _lambda * self.P[user][f])
                         self.Q[item][f] +=alpha *(eui * self.P[user][f] - _lambda * self.Q[item][f])
+            if(step % 10 ==0):
+                self.mse_result.append(self.mse())
 '''
 user_items = {1: {'a': 1, 'b': 1, 'c': 1, 'd': 2, 'e': 2, 'f': 2, 'g': 3},
               2: {'a': 4, 'b': 4, 'c': 5, 'd': 5, 'e': 4, 'f': 3, 'g': 1},

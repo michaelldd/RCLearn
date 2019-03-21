@@ -6,7 +6,6 @@ import numpy as np
 
 class SVDPlsuPlus():
     '''
-    bu,bi = random.random(),random.random()
     属性：
         P、Q：P、Q矩阵
         bu：user偏置项
